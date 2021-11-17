@@ -38,7 +38,7 @@ const fetchEditContact = (SelectdPersonId,first,last,block,cityAddress,postCode,
         })
       })
     }
-  });
+  })
 }
 
 // listen to save  ===========================================
@@ -71,7 +71,7 @@ const listenToDeleteButton = (deleteBtn) => {
            method: 'DELETE'
         })
       }
-    });
+    })
   })
 }
 
@@ -137,6 +137,15 @@ const fetchAddressInfo = (city, postCode, street) => {
   })
 }
 
+// async function getContactsAndUpdateState(index){
+//   if(index <0) {
+//     index = 0;
+//   }
+//   const gettingContacts = await getContacts();
+//   state.selectedContact = state.contacts[index];
+//   renderContactView();
+// }
+
 // fetch contact info======================================
 const fetchContactInfo = (firstName, lastName, blockContact, addressId) => {
   fetch(`${contactsURL}`, {
@@ -149,6 +158,14 @@ const fetchContactInfo = (firstName, lastName, blockContact, addressId) => {
       "addressId": addressId,
     })
   })
+  .then(res => res.json())
+  // There is a bug in liveserver: it refresh page after posting request
+  // to avoid it, remove the list of contacts and then update state
+  // .then(() => {
+  //   const list = document.querySelector('.contacts-list');
+  //   list.remove();
+  //   getContactsAndUpdateState(state.contacts.length-1);
+  // })
 }
 
 
@@ -289,15 +306,21 @@ const renderContactsList = () => {
 }
 
 // get contacts================================================
-const getContacts = () => {
-  fetch(`${contactsURL}`)
-    .then(res => res.json())
-    .then(data => {
-      state.contacts = data;
-      console.log('first state: ', state);
-      renderContactsList();
-    });
+async function getContacts() {
+  const response = await fetch("http://localhost:3000/contacts");
+  const data = await response.json();
+  state.contacts = data;
+  console.log('first state: ', state);
+  renderContactsList();
 }
+
+// function deletec(){
+//    fetch("http://localhost:3000/addresses/8", {
+//       method: 'DELETE'
+//     })
+// }
+
+// deletec()
 
 // init app==================================
 const init = () => {
